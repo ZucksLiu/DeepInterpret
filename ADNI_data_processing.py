@@ -20,13 +20,12 @@ cls_list= [0, 1] # 0 - AD, 1 - NC, 2 - MCI
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 ut.set_seed(2020)
-pathall_saveimg = "/scratch/users/zucks626/ADNI/ADNI_Longitudinal_all/save_image/"
-IPMI_save = "/scratch/users/zucks626/ADNI/IPMI/checkpoints/"
-ADNI_path_group_data = "/home/groups/kpohl/data/adni/img_64_longitudinal/"
+IPMI_save = "/ADNI/IPMI/checkpoints/"
+ADNI_path_group_data = "/data/adni/img_64_longitudinal/"
 
-ADNI_data_name_list_txt = "/home/users/zucks626/miccai/adni_list.txt"
+ADNI_data_name_list_txt = "adni_list.txt"
 
-IPMI_data_pickle_save_path = "/scratch/users/zucks626/ADNI/IPMI/data_pickle_saved/"
+IPMI_data_pickle_save_path = "/ADNI/IPMI/data_pickle_saved/"
 FLAG_Save_data_pickle = False
 DEBUG_VERBOSE = False
 

@@ -31,7 +31,6 @@ parser.add_argument('--Type',     type=str, default='ADNI_CLS',     help="Flag f
 parser.add_argument('--iter_restart', type=int, default=1400, help="Save model every n iterations")
 parser.add_argument('--BATCH_SIZE',     type=int, default=40,     help="Flag for training")
 parser.add_argument('--iter_load',     type=int, default=1,     help="Flag for loading version of model")
-parser.add_argument('--Siamese',     type=str, default='SiameseNetAEReg', help="SiameseNetAE\SiameseNet\SiameseNetW\SiamgeseNetAEReg")
 args = parser.parse_args()
 
 cyc_con_layout = [
@@ -76,27 +75,16 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 ut.set_seed(2020)
 
 
-pathall_saveimg = "/scratch/users/zucks626/ADNI/ADNI_Longitudinal_all/save_image/"
-IPMI_save = "/scratch/users/zucks626/ADNI/IPMI/checkpoints/"
-ADNI_path_group_data = "/home/groups/kpohl/data/adni/img_64_longitudinal/"
+pathall_saveimg = "/ADNI/ADNI_Longitudinal_all/save_image/"
+IPMI_save = "/ADNI/IPMI/checkpoints/"
+ADNI_path_group_data = "/data/adni/img_64_longitudinal/"
 
-ADNI_data_name_list_txt = "/home/users/zucks626/miccai/adni_list.txt"
+ADNI_data_name_list_txt = "adni_list.txt"
 
-IPMI_data_pickle_save_path = "/scratch/users/zucks626/ADNI/IPMI/data_pickle_saved/"
+IPMI_data_pickle_save_path = "/ADNI/IPMI/data_pickle_saved/"
 fold_list_4_image_path = IPMI_data_pickle_save_path + 'ADNI_ADNC_fold_list_4_image.txt'
 FLAG_Save_data_pickle = False
 DEBUG_VERBOSE = True
-# if FLAG_Save_data_pickle == True:
-#     Dataset = ut.get_Longitudinal_dataset_from_raw_image(ADNI_path_group_data)
-#     f = open(IPMI_data_pickle_save_path + "ADNI_Dataset.pkl","wb")
-#     pkl.dump(Dataset, f)
-#     f.close()
-#     print('Save Dataset success! Len of Dataset is:', len(Dataset)) 
-# else:
-#     f = open(IPMI_data_pickle_save_path + "ADNI_Dataset.pkl","rb")
-#     Dataset = pkl.load(f)
-#     f.close() 
-#     print('Load Dataset success! Len of Dataset is:', len(Dataset))  
 
 label_file_path = IPMI_data_pickle_save_path + 'ADNI1AND2.csv'
 if FLAG_Save_data_pickle == True:
@@ -107,52 +95,8 @@ else:
     f.close() 
     print('Load Id_attr.pkl success!')  
 
-# if FLAG_Save_data_pickle == True:
-#     pass
-# else:
-#     f = open(IPMI_data_pickle_save_path + "information_related_to_test_dataset.pkl","rb")
-#     information_related_to_test_dataset = pkl.load(f)
-#     f.close() 
-#     print('Load test visualization dataset success!')  
-# test_dataset = information_related_to_test_dataset[0]
-# num_of_test_pair = test_dataset.shape[0]
-# print('test visualization dataset shape is:', test_dataset.shape) # shape: (BS, 2, 64, 64, 64)
-# test_visualization_loader = ut.split_test_dataset(test_dataset, BATCH_SIZE=10)
-# dataset, labels, subject_id, num_image_wrt_subject, label_wrt_subject = ut.get_dataset_from_idx_file_and_label_from_Id_attr(ADNI_data_name_list_txt, ADNI_path_group_data, Id_attr)
-# selected_label_list, cls_stats = ut.select_data_given_label_list(labels, label_list=[0, 1])
-# selected_label_wrt_subject_list, cls_stats_1 = ut.select_data_given_label_list(label_wrt_subject, label_list=[0, 1])
-# if DEBUG_VERBOSE == True:
-#     print(selected_label_list, cls_stats)
-#     print(selected_label_wrt_subject_list, cls_stats_1)
-# fold_list = ut.get_fold_list_from_dataset_and_label(num_image_wrt_subject, label_wrt_subject, cls_stats, label_list=[0, 1])
-# if DEBUG_VERBOSE == True:
-#     print(list(fold_list))
-# np.savetxt(IPMI_data_pickle_save_path + 'ADNI_ADNC_fold_list_wrt_subject.txt', fold_list, fmt='%1.1f')
-# fold_list_4_image = ut.get_fold_list_4_image_from_wrt_subject(subject_id, fold_list)
-# np.savetxt(IPMI_data_pickle_save_path + 'ADNI_ADNC_fold_list_4_image.txt', fold_list_4_image, fmt='%1.1f')
-# sleep(10000)
 Type = args.Type    
-if Type == 'Run_cls' and args.train > 0:
-    ''' Extract data from pickle file'''
-    # f = open(pathall_saveimg + "augment_pair_cls_AD.pkl", "rb")
-    # pair = pkl.load(f)
-    # f.close()
-    # f = open(pathall_saveimg + "augment_d_cls_AD.pkl", "rb")
-    f = open(pathall_saveimg + "dataset_pair_realone_adni.pkl", "rb")
-    dataset = pkl.load(f)
-    f.close()    
-    print(dataset.shape)
-    sleep(1000)
-    f = open(pathall_saveimg + "augment_label_cls_AD.pkl", "rb")
-    label = pkl.load(f)
-    f.close()  
-    id_idx, cal_idx = ut.get_idx_label(label)
-    pair_new, label_new = ut.get_pair_idx_label_new(id_idx, pair, cls_list)
-    print(pair_new)
-    print(label_new)
-    print(len(pair_new))
-    train_loader_list, train_label_loader_list = ut.split_dataset_folds_new_true_subject(dataset, label_new, pair_new, folds=5, BATCH_SIZE = args.BATCH_SIZE, shuffle=True, seed=2020)
-elif Type == 'ADNI_CLS':
+if Type == 'ADNI_CLS':
     FLAG_TEST_FOLD = 4
     _, labels, _, _, _ = ut.get_dataset_from_idx_file_and_label_from_Id_attr(ADNI_data_name_list_txt, ADNI_path_group_data, Id_attr, normalize=False, mask_dataset=True)
     f = open(IPMI_data_pickle_save_path + "ADNI_ADNC_orig_data_fold_fp32.pkl", "rb")
@@ -163,18 +107,6 @@ elif Type == 'ADNI_CLS':
     f.close()  
     file_idx = np.genfromtxt(ADNI_data_name_list_txt, dtype='str') 
     fold_list_4_image = np.genfromtxt(fold_list_4_image_path, dtype='float') 
-    # f = open(IPMI_data_pickle_save_path + "ADNI_ADNC_augment_data_fold_0_fp32.pkl", "rb")
-    # augment_data_fold_0 = pkl.load(f)
-    # f.close()  
-    # f = open(IPMI_data_pickle_save_path + "ADNI_ADNC_augment_label_fold_0.pkl", "rb")
-    # augment_label_fold_0 = pkl.load(f)
-    # f.close()  
-    # f = open(IPMI_data_pickle_save_path + "ADNI_ADNC_augment_data_fold_1_fp32.pkl", "rb")
-    # augment_data_fold_1 = pkl.load(f)
-    # f.close()  
-    # f = open(IPMI_data_pickle_save_path + "ADNI_ADNC_augment_label_fold_1.pkl", "rb")
-    # augment_label_fold_1 = pkl.load(f)
-    # f.close() 
     print('Load data fold and label success!') # TODO: rich log information
     filename_of_data_fold = ut.get_filename_of_data_fold_from_fold_list_4_image(ADNI_data_name_list_txt, fold_list_4_image, labels, num_cls=2, fold_num=5)
     print(filename_of_data_fold)
@@ -182,7 +114,7 @@ elif Type == 'ADNI_CLS':
         for i in range(2):
             for j in range(5):
                 print(len(filename_of_data_fold[i][j]))
-        # sleep(10000)
+
 
 def save_data_to_nii(folder_dir, file_name, data, fold, save_type='both'):
     if save_type == 'both':
@@ -346,8 +278,7 @@ def main():
     cls_global_step = 400
     ut.load_model_by_name(cls, global_step=cls_global_step, device=device)
     print('Load model!')
-    # print(list(cls.named_modules()))
-    # sleep(1000)
+
     FLAG_COND_TYPE = 'Cond'
     cyc_con_global_step = 950
     trans = Convnet_SkipConnection(in_ch=1, out_ch=3, name='trans', device=device, z_dim=args.z, conv_type=FLAG_COND_TYPE)
